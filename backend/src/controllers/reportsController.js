@@ -1,0 +1,111 @@
+const Expense = require("../models/Expense");
+const Category = require("../models/Category");
+const Settings = require("../models/Settings");
+
+module.exports = {
+  async dashboard(req, res) {
+    try {
+      const { month, year, category } = req.query;
+
+      const now = new Date();
+      const selectedMonth = month ? Number(month) - 1 : now.getMonth();
+      const selectedYear = year ? Number(year) : now.getFullYear();
+
+      const firstDay = new Date(selectedYear, selectedMonth, 1);
+      const lastDay = new Date(selectedYear, selectedMonth + 1, 0);
+
+      const matchFilter = {
+        date: { $gte: firstDay, $lte: lastDay }
+      };
+
+      if (category) {
+        matchFilter.category = category;
+      }
+
+      const totalMonth = await Expense.aggregate([
+        { $match: matchFilter },
+        { $group: { _id: null, total: { $sum: "$value" } } }
+      ]);
+
+      const total = totalMonth[0]?.total || 0;
+
+      const byCategory = await Expense.aggregate([
+        { $match: matchFilter },
+        { $group: { _id: "$category", value: { $sum: "$value" } } },
+        {
+          $lookup: {
+            from: "categories",
+            localField: "_id",
+            foreignField: "_id",
+            as: "category"
+          }
+        },
+        { $unwind: "$category" },
+        {
+          $project: {
+            _id: 0,
+            category: "$category.name",
+            color: "$category.color",
+            value: 1
+          }
+        }
+      ]);
+
+      const monthly = await Expense.aggregate([
+        {
+          $group: {
+            _id: {
+              year: { $year: "$date" },
+              month: { $month: "$date" }
+            },
+            value: { $sum: "$value" }
+          }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } },
+        {
+          $project: {
+            _id: 0,
+            month: {
+              $concat: [
+                {
+                  $arrayElemAt: [
+                    ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
+                    { $subtract: ["$_id.month", 1] }
+                  ]
+                },
+                " ",
+                { $toString: "$_id.year" }
+              ]
+            },
+            value: 1
+          }
+        }
+      ]);
+
+      let settings = await Settings.findOne();
+
+      if (!settings) {
+        settings = await Settings.create({
+          monthlyGoal: 1200,
+          salary: 0
+        });
+      }
+
+      const goal = settings?.monthlyGoal ?? 1200;
+      const salary = settings?.salary ?? 0;
+
+      res.json({
+        totalMonth: total,
+        goal,
+        remaining: goal - total,
+        salary,
+        byCategory,
+        monthly
+      });
+
+    } catch (err) {
+      console.error("Erro no dashboard:", err);
+      res.status(500).json({ error: "Erro ao gerar dashboard" });
+    }
+  }
+};

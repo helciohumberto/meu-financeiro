@@ -1,0 +1,17 @@
+{
+  "name": "meu-financeiro-app",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "nodemon --exec electron ."
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^26.8.1",
+    "nodemon": "^3.1.14"
+  },
+  "dependencies": {
+    "cross-env": "^10.1.0"
+  }
+}
