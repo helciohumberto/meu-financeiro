@@ -1,39 +1,104 @@
-import { Box, List, ListItemButton, ListItemText, Typography } from "@mui/material";
+import {
+  Box,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Tooltip,
+  IconButton,
+  Typography
+} from "@mui/material";
+
+import {
+  Dashboard,
+  Category,
+  Settings,
+  ListAlt,
+  AccountBalanceWallet,
+  Menu as MenuIcon,
+  ChevronLeft
+} from "@mui/icons-material";
+
 import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const menu = [
-    { label: "Início", path: "/" },
-    { label: "Dashboard", path: "/dashboard" },
-    { label: "Lançamentos", path: "/lancamentos" },
-    { label: "Categorias", path: "/categorias" },
-    { label: "Configurações", path: "/settings" }
+  const [collapsed, setCollapsed] = useState(false);
+
+  const toggleCollapse = () => setCollapsed(!collapsed);
+
+  const isActive = (path) => location.pathname === path;
+
+  const menuItems = [
+    { label: "Início", icon: <Dashboard />, path: "/" },
+    { label: "Dashboard", icon: <Category />, path: "/dashboard" },
+    { label: "Lançamentos", icon: <ListAlt />, path: "/lancamentos" },
+    { label: "Categorias", icon: <AccountBalanceWallet />, path: "/categorias" },
+    { label: "Configurações", icon: <Settings />, path: "/settings" }
   ];
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Typography variant="h5" fontWeight="bold" mb={4}>
-        Meu Financeiro
-      </Typography>
+    <Box
+      sx={{
+        width: collapsed ? 80 : 240,
+        transition: "0.3s ease",
+        padding: 2,
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        color: (theme) => theme.palette.text.primary
+      }}
+    >
+      {/* Header com botão de colapsar */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: collapsed ? "center" : "space-between"
+        }}
+      >
+        {!collapsed && (
+          <Typography variant="h6" fontWeight="bold">
+            Meu Financeiro
+          </Typography>
+        )}
 
+        <IconButton onClick={toggleCollapse}>
+          {collapsed ? <MenuIcon /> : <ChevronLeft />}
+        </IconButton>
+      </Box>
+
+      {/* Lista de itens */}
       <List>
-        {menu.map((item) => (
-          <ListItemButton
+        {menuItems.map((item) => (
+          <Tooltip
             key={item.path}
-            onClick={() => navigate(item.path)}
-            sx={{
-              background: location.pathname === item.path ? "#333" : "transparent",
-              borderRadius: 1,
-              mb: 1,
-              color: "white",
-              "&:hover": { background: "#444" }
-            }}
+            title={collapsed ? item.label : ""}
+            placement="right"
           >
-            <ListItemText primary={item.label} />
-          </ListItemButton>
+            <ListItemButton
+              onClick={() => navigate(item.path)}
+              sx={{
+                borderRadius: 2,
+                mb: 1,
+                background: isActive(item.path)
+                  ? "rgba(255,255,255,0.3)"
+                  : "transparent",
+                "&:hover": {
+                  background: "rgba(255,255,255,0.2)"
+                }
+              }}
+            >
+              <ListItemIcon sx={{ color: "inherit" }}>
+                {item.icon}
+              </ListItemIcon>
+
+              {!collapsed && <ListItemText primary={item.label} />}
+            </ListItemButton>
+          </Tooltip>
         ))}
       </List>
     </Box>

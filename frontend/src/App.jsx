@@ -9,19 +9,19 @@ import Categories from "./pages/Categories";
 import Expenses from "./pages/Expenses";
 import Settings from "./pages/Settings";
 
-const queryClient = new QueryClient();
+export default function App({ toggleTheme, mode }) {
+  const queryClient = new QueryClient();
 
-export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Layout>
+        <Layout toggleTheme={toggleTheme} mode={mode}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/categorias" element={<Categories />} />
             <Route path="/lancamentos" element={<Expenses />} />
-            <Route path="/settings" element={<Settings />} /> {/* <-- E AQUI */}
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </Layout>
       </BrowserRouter>
