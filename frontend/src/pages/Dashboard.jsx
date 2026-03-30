@@ -109,7 +109,7 @@ export default function Dashboard() {
         <Grid item xs={12} md={4}>
           <Card sx={{ background: "#1976d2", color: "white" }}>
             <CardContent>
-              <Typography variant="h6">Total gasto no mês</Typography>
+              <Typography variant="h6">Total gasto</Typography>
               <Typography variant="h4" fontWeight="bold">
                 €{data.totalMonth.toFixed(2)}
               </Typography>
@@ -120,7 +120,7 @@ export default function Dashboard() {
         <Grid item xs={12} md={4}>
           <Card sx={{ background: "#2e7d32", color: "white" }}>
             <CardContent>
-              <Typography variant="h6">Meta de gasto total</Typography>
+              <Typography variant="h6">Meta mensal</Typography>
               <Typography variant="h4" fontWeight="bold">
                 €{data.goal.toFixed(2)}
               </Typography>
@@ -131,7 +131,7 @@ export default function Dashboard() {
         <Grid item xs={12} md={4}>
           <Card sx={{ background: "#6a1b9a", color: "white" }}>
             <CardContent>
-              <Typography variant="h6">Ordenado</Typography>
+              <Typography variant="h6">Salário</Typography>
               <Typography variant="h4" fontWeight="bold">
                 €{Number(data.salary || 0).toFixed(2)}
               </Typography>
@@ -142,7 +142,7 @@ export default function Dashboard() {
         <Grid item xs={12} md={4}>
           <Card sx={{ background: "#d32f2f", color: "white" }}>
             <CardContent>
-              <Typography variant="h6">Falta para meta de gasto</Typography>
+              <Typography variant="h6">Falta meta</Typography>
               <Typography variant="h4" fontWeight="bold">
                 €{data.remaining.toFixed(2)}
               </Typography>

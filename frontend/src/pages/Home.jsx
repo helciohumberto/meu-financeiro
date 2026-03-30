@@ -69,7 +69,7 @@ export default function Home() {
             <Grid item xs={12} md={4}>
               <Card
                 sx={{ cursor: "pointer" }}
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/dashboard")}
               >
                 <CardContent>
                   <Typography variant="h5" fontWeight="bold">

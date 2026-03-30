@@ -7,7 +7,7 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
 import Expenses from "./pages/Expenses";
-import Settings from "./pages/Settings"; // <-- AQUI ESTÁ O QUE FALTAVA
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
