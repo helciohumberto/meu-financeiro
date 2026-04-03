@@ -9,7 +9,7 @@ import {
   Typography,
   Card,
   CardContent,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 
 import CategoryPieChart from "../components/CategoryPieChart";
@@ -19,23 +19,33 @@ export default function Dashboard() {
   const [filters, setFilters] = useState({
     month: new Date().getMonth() + 1,
     year: new Date().getFullYear(),
-    category: ""
+    category: "",
   });
 
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard", filters],
     queryFn: async () =>
-      (await api.get("/reports/dashboard", { params: filters })).data
+      (await api.get("/reports/dashboard", { params: filters })).data,
   });
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
-    queryFn: async () => (await api.get("/categories")).data
+    queryFn: async () => (await api.get("/categories")).data,
   });
 
   const months = [
-    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
-    "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+    "Jan",
+    "Fev",
+    "Mar",
+    "Abr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Set",
+    "Out",
+    "Nov",
+    "Dez",
   ];
 
   if (isLoading || !data) {
@@ -106,10 +116,22 @@ export default function Dashboard() {
 
       {/* CARDS RESUMO */}
       <Grid container spacing={3} mb={4}>
+
+        <Grid item xs={12} md={4}>
+          <Card sx={{ background: "#00897b", color: "white" }}>
+            <CardContent>
+              <Typography variant="h6">Saldo</Typography>
+              <Typography variant="h4" fontWeight="bold">
+                €{Number(data.cash || 0).toFixed(2)}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        
         <Grid item xs={12} md={4}>
           <Card sx={{ background: "#1976d2", color: "white" }}>
             <CardContent>
-              <Typography variant="h6">Total gasto</Typography>
+              <Typography variant="h6">Despesas</Typography>
               <Typography variant="h4" fontWeight="bold">
                 €{data.totalMonth.toFixed(2)}
               </Typography>
@@ -120,7 +142,7 @@ export default function Dashboard() {
         <Grid item xs={12} md={4}>
           <Card sx={{ background: "#2e7d32", color: "white" }}>
             <CardContent>
-              <Typography variant="h6">Meta mensal</Typography>
+              <Typography variant="h6">Meta</Typography>
               <Typography variant="h4" fontWeight="bold">
                 €{data.goal.toFixed(2)}
               </Typography>
@@ -142,7 +164,7 @@ export default function Dashboard() {
         <Grid item xs={12} md={4}>
           <Card sx={{ background: "#d32f2f", color: "white" }}>
             <CardContent>
-              <Typography variant="h6">Falta meta</Typography>
+              <Typography variant="h6">Diferença da meta</Typography>
               <Typography variant="h4" fontWeight="bold">
                 €{data.remaining.toFixed(2)}
               </Typography>

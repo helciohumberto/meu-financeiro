@@ -11,6 +11,7 @@ import {
 
 import {
   Dashboard,
+  Home,
   Category,
   Settings,
   ListAlt,
@@ -33,10 +34,10 @@ export default function Sidebar() {
   const isActive = (path) => location.pathname === path;
 
   const menuItems = [
-    { label: "Início", icon: <Dashboard />, path: "/" },
-    { label: "Dashboard", icon: <Category />, path: "/dashboard" },
-    { label: "Lançamentos", icon: <ListAlt />, path: "/lancamentos" },
-    { label: "Categorias", icon: <AccountBalanceWallet />, path: "/categorias" },
+    { label: "Início", icon: <Home />, path: "/" },
+    { label: "Dashboard", icon: <Dashboard />, path: "/dashboard" },
+    { label: "Lançamentos", icon: <AccountBalanceWallet />, path: "/lancamentos" },
+    { label: "Categorias", icon: <Category />, path: "/categorias" },
     { label: "Configurações", icon: <Settings />, path: "/settings" }
   ];
 

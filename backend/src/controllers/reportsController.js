@@ -93,12 +93,14 @@ module.exports = {
 
       const goal = settings?.monthlyGoal ?? 1200;
       const salary = settings?.salary ?? 0;
+      const cash = salary - total;
 
       res.json({
         totalMonth: total,
         goal,
         remaining: goal - total,
         salary,
+        cash,
         byCategory,
         monthly
       });

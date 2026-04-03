@@ -1,17 +1,40 @@
 {
   "name": "meu-financeiro-app",
   "version": "1.0.0",
+  "description": "Aplicativo desktop do Meu Financeiro",
   "main": "main.js",
+  "author": "Hélcio",
   "scripts": {
     "start": "electron .",
-    "dev": "nodemon --exec electron ."
+    "dev": "nodemon --exec electron .",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "cross-env": "^10.1.0"
   },
   "devDependencies": {
     "electron": "^28.3.3",
     "electron-builder": "^26.8.1",
     "nodemon": "^3.1.14"
   },
-  "dependencies": {
-    "cross-env": "^10.1.0"
+  "build": {
+    "appId": "com.meufinanceiro.desktop",
+    "productName": "Meu Financeiro",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/*.map"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }
