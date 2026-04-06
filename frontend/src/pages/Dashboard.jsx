@@ -14,6 +14,8 @@ import {
 
 import CategoryPieChart from "../components/CategoryPieChart";
 import MonthlyLineChart from "../components/MonthlyLineChart";
+import RemessasBarChart from "../components/RemessasBarChart";
+import { getExchangeRate } from "../services/exchange";
 
 export default function Dashboard() {
   const [filters, setFilters] = useState({
@@ -22,32 +24,40 @@ export default function Dashboard() {
     category: "",
   });
 
+  // 🔹 Dashboard principal
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard", filters],
     queryFn: async () =>
       (await api.get("/reports/dashboard", { params: filters })).data,
   });
 
+  // 🔹 Categorias
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => (await api.get("/categories")).data,
   });
 
-  const months = [
-    "Jan",
-    "Fev",
-    "Mar",
-    "Abr",
-    "Mai",
-    "Jun",
-    "Jul",
-    "Ago",
-    "Set",
-    "Out",
-    "Nov",
-    "Dez",
-  ];
+  // 🔹 Gráfico de remessas
+  const { data: graficoRemessas } = useQuery({
+    queryKey: ["graficoRemessas", filters.year],
+    queryFn: async () =>
+      (await api.get(`/remessas/grafico/${filters.year}`)).data,
+  });
 
+  // 🔹 Câmbio EUR → BRL (API nova)
+  const { data: exchange } = useQuery({
+    queryKey: ["exchangeRate"],
+    queryFn: getExchangeRate,
+  });
+  console.log("exchange:", exchange);
+
+  // 🔹 Conversão sem taxa
+  const converterParaBRL = (valorEuro) => {
+    if (!exchange?.rates?.BRL) return null;
+    return valorEuro * exchange.rates.BRL;
+  };
+
+  // 🔹 Loading geral
   if (isLoading || !data) {
     return (
       <Box sx={{ padding: 4 }}>
@@ -55,6 +65,11 @@ export default function Dashboard() {
       </Box>
     );
   }
+
+  const months = [
+    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+    "Jul", "Ago", "Set", "Out", "Nov", "Dez",
+  ];
 
   return (
     <Box sx={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -116,7 +131,6 @@ export default function Dashboard() {
 
       {/* CARDS RESUMO */}
       <Grid container spacing={3} mb={4}>
-
         <Grid item xs={12} md={4}>
           <Card sx={{ background: "#00897b", color: "white" }}>
             <CardContent>
@@ -127,7 +141,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} md={4}>
           <Card sx={{ background: "#1976d2", color: "white" }}>
             <CardContent>
@@ -171,6 +185,20 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </Grid>
+
+        {/* ⭐ TOTAL ENVIADO NO MÊS */}
+        {/* ⭐ TOTAL ENVIADO NO MÊS */}
+<Grid item xs={12} md={4}>
+  <Card sx={{ background: "#ff6f00", color: "white" }}>
+    <CardContent>
+      <Typography variant="h6">Enviado este mês</Typography>
+
+      <Typography variant="h4" fontWeight="bold">
+        €{Number(data.totalEnviadoMes || 0).toFixed(2)}
+      </Typography>
+    </CardContent>
+  </Card>
+</Grid>
       </Grid>
 
       {/* GRÁFICOS */}
@@ -187,6 +215,13 @@ export default function Dashboard() {
             Evolução mensal
           </Typography>
           <MonthlyLineChart data={data.monthly || []} />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Typography variant="h6" mb={2}>
+            Remessas para o Brasil (ano)
+          </Typography>
+          <RemessasBarChart data={graficoRemessas || []} />
         </Grid>
       </Grid>
     </Box>

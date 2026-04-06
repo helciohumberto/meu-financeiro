@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Layout from "./components/Layout";
 
+import Remessas from "./pages/Remessas";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
@@ -21,6 +22,7 @@ export default function App({ toggleTheme, mode }) {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/categorias" element={<Categories />} />
             <Route path="/lancamentos" element={<Expenses />} />
+            <Route path="/remessas" element={<Remessas />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </Layout>

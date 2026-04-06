@@ -1,6 +1,7 @@
 const Expense = require("../models/Expense");
 const Category = require("../models/Category");
 const Settings = require("../models/Settings");
+const Remessa = require("../models/Remessa");
 
 module.exports = {
   async dashboard(req, res) {
@@ -22,6 +23,9 @@ module.exports = {
         matchFilter.category = category;
       }
 
+      // ============================
+      // TOTAL DE DESPESAS DO MÊS
+      // ============================
       const totalMonth = await Expense.aggregate([
         { $match: matchFilter },
         { $group: { _id: null, total: { $sum: "$value" } } }
@@ -29,6 +33,9 @@ module.exports = {
 
       const total = totalMonth[0]?.total || 0;
 
+      // ============================
+      // DESPESAS POR CATEGORIA
+      // ============================
       const byCategory = await Expense.aggregate([
         { $match: matchFilter },
         { $group: { _id: "$category", value: { $sum: "$value" } } },
@@ -51,6 +58,9 @@ module.exports = {
         }
       ]);
 
+      // ============================
+      // GRÁFICO MENSAL DE DESPESAS
+      // ============================
       const monthly = await Expense.aggregate([
         {
           $group: {
@@ -82,6 +92,9 @@ module.exports = {
         }
       ]);
 
+      // ============================
+      // CONFIGURAÇÕES (META E SALÁRIO)
+      // ============================
       let settings = await Settings.findOne();
 
       if (!settings) {
@@ -93,8 +106,35 @@ module.exports = {
 
       const goal = settings?.monthlyGoal ?? 1200;
       const salary = settings?.salary ?? 0;
-      const cash = salary - total;
 
+      // ============================
+      // TOTAL ENVIADO NO MÊS (REMESSAS)
+      // ============================
+      const remessaMes = await Remessa.findOne({
+        month: selectedMonth + 1,
+        year: selectedYear
+      });
+
+      const totalEnviadoMes = remessaMes ? remessaMes.amount : 0;
+
+      // ============================
+      // TOTAL ENVIADO NO ANO
+      // ============================
+      const remessasAno = await Remessa.find({ year: selectedYear });
+
+      const totalEnviadoAno = remessasAno.reduce(
+        (sum, r) => sum + (r.amount || 0),
+        0
+      );
+
+      // ============================
+      // SALDO ATUAL
+      // ============================
+      const cash = salary - total - totalEnviadoMes;
+
+      // ============================
+      // RETORNO FINAL
+      // ============================
       res.json({
         totalMonth: total,
         goal,
@@ -102,7 +142,9 @@ module.exports = {
         salary,
         cash,
         byCategory,
-        monthly
+        monthly,
+        totalEnviadoMes,
+        totalEnviadoAno
       });
 
     } catch (err) {

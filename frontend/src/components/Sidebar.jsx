@@ -14,10 +14,10 @@ import {
   Home,
   Category,
   Settings,
-  ListAlt,
   AccountBalanceWallet,
   Menu as MenuIcon,
-  ChevronLeft
+  ChevronLeft,
+  Send
 } from "@mui/icons-material";
 
 import { useNavigate, useLocation } from "react-router-dom";
@@ -38,6 +38,10 @@ export default function Sidebar() {
     { label: "Dashboard", icon: <Dashboard />, path: "/dashboard" },
     { label: "Lançamentos", icon: <AccountBalanceWallet />, path: "/lancamentos" },
     { label: "Categorias", icon: <Category />, path: "/categorias" },
+
+    // ⭐ NOVO ITEM ADICIONADO AQUI
+    { label: "Remessas", icon: <Send />, path: "/remessas" },
+
     { label: "Configurações", icon: <Settings />, path: "/settings" }
   ];
 
