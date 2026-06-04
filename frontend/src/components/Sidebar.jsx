@@ -51,6 +51,7 @@ export default function Sidebar() {
         width: collapsed ? 80 : 240,
         transition: "0.3s ease",
         padding: 2,
+        paddingTop: "60px",
         display: "flex",
         flexDirection: "column",
         gap: 2,

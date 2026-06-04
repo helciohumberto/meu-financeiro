@@ -44,7 +44,8 @@ export default function Layout({ children, toggleTheme, mode }) {
         sx={{
           flexGrow: 1,
           overflowY: "auto",
-          padding: 4,
+          padding: 5,
+          paddingTop: "60px",
           color: (theme) => theme.palette.text.primary
         }}
       >

@@ -9,12 +9,15 @@ import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
 import Expenses from "./pages/Expenses";
 import Settings from "./pages/Settings";
+import Titlebar from "./components/Titlebar/Titlebar";
+import "./components/Titlebar/Titlebar.css";
 
 export default function App({ toggleTheme, mode }) {
   const queryClient = new QueryClient();
 
   return (
     <QueryClientProvider client={queryClient}>
+      <Titlebar mode={mode} />
       <BrowserRouter>
         <Layout toggleTheme={toggleTheme} mode={mode}>
           <Routes>

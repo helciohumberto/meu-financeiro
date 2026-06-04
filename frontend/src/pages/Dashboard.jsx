@@ -191,7 +191,7 @@ export default function Dashboard() {
 <Grid item xs={12} md={4}>
   <Card sx={{ background: "#ff6f00", color: "white" }}>
     <CardContent>
-      <Typography variant="h6">Enviado este mês</Typography>
+      <Typography variant="h6">Enviado para o Brasil</Typography>
 
       <Typography variant="h4" fontWeight="bold">
         €{Number(data.totalEnviadoMes || 0).toFixed(2)}

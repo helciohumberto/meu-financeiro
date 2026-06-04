@@ -1,0 +1,67 @@
+/* ================================
+   INPUTS VEGA — LIGHT + DARK VISÍVEIS
+================================ */
+
+/* Container do input */
+.MuiTextField-root .MuiOutlinedInput-root {
+  border-radius: 10px;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(10px);
+}
+
+/* Fundo adaptado ao tema */
+body.light-mode .MuiOutlinedInput-root {
+  background: rgba(0, 0, 0, 0.08); /* mais escuro → input visível */
+}
+
+body.dark-mode .MuiOutlinedInput-root {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Borda padrão */
+.MuiOutlinedInput-notchedOutline {
+  border-color: rgba(0, 0, 0, 0.25) !important;
+}
+
+body.dark-mode .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Hover */
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+
+/* Texto */
+.MuiInputBase-input {
+  color: inherit !important;
+}
+
+/* Label */
+.MuiInputLabel-root {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+body.dark-mode .MuiInputLabel-root {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+
+/* MenuItem */
+.MuiMenuItem-root {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+.MuiMenuItem-root:hover {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+body.dark-mode .MuiMenuItem-root:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+}

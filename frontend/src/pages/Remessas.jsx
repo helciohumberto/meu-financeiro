@@ -33,8 +33,9 @@ export default function Remessas() {
       month,
       year,
       amount: Number(amount)
-    });
 
+    });
+    
     limparFormulario();
     carregarTudo();
   };
@@ -129,13 +130,17 @@ export default function Remessas() {
         />
 
         <TextField
-          fullWidth
-          label="Valor enviado (€)"
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          sx={{ mb: 2 }}
-        />
+  fullWidth
+  label="Valor enviado (€)"
+  type="number"
+  value={amount}
+  error={Number(amount) <= 0}
+  helperText={
+    Number(amount) <= 0 ? "O valor deve ser maior que zero." : ""
+  }
+  onChange={(e) => setAmount(e.target.value)}
+  sx={{ mb: 2 }}
+/>
 
         <Box sx={{ display: "flex", gap: 2 }}>
           <Button

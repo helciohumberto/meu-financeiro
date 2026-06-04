@@ -53,7 +53,7 @@ export default function Categories() {
   });
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 5 }}>
       <Typography variant="h4" fontWeight="bold" gutterBottom>
         Categorias
       </Typography>
