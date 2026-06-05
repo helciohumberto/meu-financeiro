@@ -1,53 +1,37 @@
 const express = require("express");
 const Remessa = require("../models/Remessa");
-const Finance = require("../models/Finance");
 
 const router = express.Router();
 
 /* ============================================================
-   REGISTRAR REMESSA (CRIAR OU ATUALIZAR) + AJUSTAR SALDO
+   REGISTRAR REMESSA (CRIAR OU ATUALIZAR)
+
+   O saldo (cash) é calculado dinamicamente pelo dashboard
+   (salary - despesas do mês - remessa do mês), portanto aqui
+   apenas persistimos a remessa — sem manter um saldo paralelo.
    ============================================================ */
 router.post("/", async (req, res) => {
   try {
     const { month, year, amount } = req.body;
 
-    // Verifica se já existe remessa no mês
+    // Verifica se já existe remessa no mês (uma remessa por mês/ano)
     const existente = await Remessa.findOne({ month, year });
 
-    let finance = await Finance.findOne();
-    if (!finance) finance = await Finance.create({ cash: 0 });
-
-    // Se já existe, precisamos ajustar o saldo corretamente
     if (existente) {
-      // devolve o valor antigo para o saldo
-      finance.cash += existente.amount;
-
-      // desconta o novo valor
-      finance.cash -= Number(amount);
-
-      await finance.save();
-
       existente.amount = amount;
       await existente.save();
 
       return res.json({
-        message: "Remessa atualizada e saldo ajustado",
-        remessa: existente,
-        saldoAtual: finance.cash
+        message: "Remessa atualizada",
+        remessa: existente
       });
     }
 
-    // Se NÃO existe, cria nova remessa
     const remessa = await Remessa.create({ month, year, amount });
 
-    // desconta do saldo
-    finance.cash -= Number(amount);
-    await finance.save();
-
     res.json({
-      message: "Remessa registrada e saldo atualizado",
-      remessa,
-      saldoAtual: finance.cash
+      message: "Remessa registrada",
+      remessa
     });
 
   } catch (err) {
@@ -68,17 +52,6 @@ router.put("/:id", async (req, res) => {
       return res.status(404).json({ error: "Remessa não encontrada" });
     }
 
-    let finance = await Finance.findOne();
-    if (!finance) finance = await Finance.create({ cash: 0 });
-
-    // devolve o valor antigo
-    finance.cash += remessa.amount;
-
-    // desconta o novo valor
-    finance.cash -= Number(amount);
-
-    await finance.save();
-
     remessa.amount = amount;
     remessa.month = month;
     remessa.year = year;
@@ -86,8 +59,7 @@ router.put("/:id", async (req, res) => {
 
     res.json({
       message: "Remessa atualizada com sucesso",
-      remessa,
-      saldoAtual: finance.cash
+      remessa
     });
 
   } catch (err) {
@@ -106,18 +78,10 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({ error: "Remessa não encontrada" });
     }
 
-    let finance = await Finance.findOne();
-    if (!finance) finance = await Finance.create({ cash: 0 });
-
-    // devolve o valor da remessa deletada
-    finance.cash += remessa.amount;
-    await finance.save();
-
     await remessa.deleteOne();
 
     res.json({
-      message: "Remessa deletada e saldo ajustado",
-      saldoAtual: finance.cash
+      message: "Remessa deletada"
     });
 
   } catch (err) {
