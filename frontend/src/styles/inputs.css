@@ -1,67 +1,32 @@
 /* ================================
-   INPUTS VEGA — LIGHT + DARK VISÍVEIS
+   ESTILOS GLOBAIS
+   O tema (MUI) cuida de inputs, cards e cores.
+   Aqui ficam apenas ajustes globais de polimento.
 ================================ */
 
-/* Container do input */
-.MuiTextField-root .MuiOutlinedInput-root {
-  border-radius: 10px;
-  transition: all 0.25s ease;
-  backdrop-filter: blur(10px);
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Fundo adaptado ao tema */
-body.light-mode .MuiOutlinedInput-root {
-  background: rgba(0, 0, 0, 0.08); /* mais escuro → input visível */
+/* Scrollbar discreta e moderna */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-body.dark-mode .MuiOutlinedInput-root {
-  background: rgba(255, 255, 255, 0.08);
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-/* Borda padrão */
-.MuiOutlinedInput-notchedOutline {
-  border-color: rgba(0, 0, 0, 0.25) !important;
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.35);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
-body.dark-mode .MuiOutlinedInput-notchedOutline {
-  border-color: rgba(255, 255, 255, 0.25) !important;
-}
-
-/* Hover */
-.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: rgba(0, 0, 0, 0.4) !important;
-}
-
-body.dark-mode .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: rgba(255, 255, 255, 0.35) !important;
-}
-
-
-/* Texto */
-.MuiInputBase-input {
-  color: inherit !important;
-}
-
-/* Label */
-.MuiInputLabel-root {
-  color: rgba(0, 0, 0, 0.6) !important;
-}
-
-body.dark-mode .MuiInputLabel-root {
-  color: rgba(255, 255, 255, 0.6) !important;
-}
-
-
-/* MenuItem */
-.MuiMenuItem-root {
-  background: transparent !important;
-  color: inherit !important;
-}
-
-.MuiMenuItem-root:hover {
-  background: rgba(0, 0, 0, 0.08) !important;
-}
-
-body.dark-mode .MuiMenuItem-root:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.55);
+  background-clip: content-box;
 }

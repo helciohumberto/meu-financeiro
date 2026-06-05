@@ -12,13 +12,14 @@ const router = express.Router();
    ============================================================ */
 router.post("/", async (req, res) => {
   try {
-    const { month, year, amount } = req.body;
+    const { month, year, amount, rate } = req.body;
 
     // Verifica se já existe remessa no mês (uma remessa por mês/ano)
     const existente = await Remessa.findOne({ month, year });
 
     if (existente) {
       existente.amount = amount;
+      if (rate != null) existente.rate = rate;
       await existente.save();
 
       return res.json({
@@ -27,7 +28,7 @@ router.post("/", async (req, res) => {
       });
     }
 
-    const remessa = await Remessa.create({ month, year, amount });
+    const remessa = await Remessa.create({ month, year, amount, rate });
 
     res.json({
       message: "Remessa registrada",
@@ -45,7 +46,7 @@ router.post("/", async (req, res) => {
    ============================================================ */
 router.put("/:id", async (req, res) => {
   try {
-    const { amount, month, year } = req.body;
+    const { amount, month, year, rate } = req.body;
 
     const remessa = await Remessa.findById(req.params.id);
     if (!remessa) {
@@ -55,6 +56,7 @@ router.put("/:id", async (req, res) => {
     remessa.amount = amount;
     remessa.month = month;
     remessa.year = year;
+    if (rate != null) remessa.rate = rate;
     await remessa.save();
 
     res.json({

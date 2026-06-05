@@ -63,13 +63,31 @@ export default function Sidebar() {
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: collapsed ? "center" : "space-between"
+          justifyContent: collapsed ? "center" : "space-between",
+          gap: 1,
         }}
       >
         {!collapsed && (
-          <Typography variant="h6" fontWeight="bold">
-            Meu Financeiro
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Box
+              sx={{
+                width: 34,
+                height: 34,
+                borderRadius: 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                background: (t) =>
+                  `linear-gradient(135deg, ${t.palette.primary.main}, ${t.palette.primary.dark})`,
+              }}
+            >
+              <AccountBalanceWallet fontSize="small" />
+            </Box>
+            <Typography variant="h6" fontWeight={700} noWrap>
+              Meu Financeiro
+            </Typography>
+          </Box>
         )}
 
         <IconButton onClick={toggleCollapse}>
@@ -78,34 +96,58 @@ export default function Sidebar() {
       </Box>
 
       {/* Lista de itens */}
-      <List>
-        {menuItems.map((item) => (
-          <Tooltip
-            key={item.path}
-            title={collapsed ? item.label : ""}
-            placement="right"
-          >
-            <ListItemButton
-              onClick={() => navigate(item.path)}
-              sx={{
-                borderRadius: 2,
-                mb: 1,
-                background: isActive(item.path)
-                  ? "rgba(255,255,255,0.3)"
-                  : "transparent",
-                "&:hover": {
-                  background: "rgba(255,255,255,0.2)"
-                }
-              }}
+      <List sx={{ mt: 1 }}>
+        {menuItems.map((item) => {
+          const active = isActive(item.path);
+          return (
+            <Tooltip
+              key={item.path}
+              title={collapsed ? item.label : ""}
+              placement="right"
             >
-              <ListItemIcon sx={{ color: "inherit" }}>
-                {item.icon}
-              </ListItemIcon>
+              <ListItemButton
+                onClick={() => navigate(item.path)}
+                sx={{
+                  borderRadius: 2,
+                  mb: 0.5,
+                  px: 1.5,
+                  color: active ? "primary.main" : "text.secondary",
+                  bgcolor: (t) =>
+                    active
+                      ? t.palette.mode === "light"
+                        ? "rgba(13,148,136,0.10)"
+                        : "rgba(13,148,136,0.18)"
+                      : "transparent",
+                  "&:hover": {
+                    bgcolor: (t) =>
+                      t.palette.mode === "light"
+                        ? "rgba(13,148,136,0.06)"
+                        : "rgba(255,255,255,0.05)",
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    color: "inherit",
+                    minWidth: collapsed ? 0 : 40,
+                    justifyContent: "center",
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
 
-              {!collapsed && <ListItemText primary={item.label} />}
-            </ListItemButton>
-          </Tooltip>
-        ))}
+                {!collapsed && (
+                  <ListItemText
+                    primary={item.label}
+                    primaryTypographyProps={{
+                      fontWeight: active ? 700 : 500,
+                    }}
+                  />
+                )}
+              </ListItemButton>
+            </Tooltip>
+          );
+        })}
       </List>
     </Box>
   );

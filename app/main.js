@@ -2,8 +2,15 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const { spawn, execFile } = require("child_process");
 const path = require("path");
 
+const isDev = !app.isPackaged;
+
 let backendProcess;
 
+/* ============================================================
+   DESENVOLVIMENTO
+   Mata a porta 3001 e sobe o backend como processo separado,
+   carregando o frontend a partir do dev server do Vite.
+   ============================================================ */
 function killPort(callback) {
   execFile(
     "cmd.exe",
@@ -13,23 +20,38 @@ function killPort(callback) {
   );
 }
 
-function startBackend() {
+function startBackendDev() {
   backendProcess = spawn("node", ["backend/src/server.js"], {
     cwd: path.join(__dirname, ".."),
-    stdio: ["ignore", "pipe", "pipe"], // captura stdout e stderr
+    stdio: ["ignore", "pipe", "pipe"],
   });
 
-  backendProcess.stdout.on("data", data => {
+  backendProcess.stdout.on("data", (data) => {
     console.log(`Backend: ${data.toString()}`);
   });
-
-  backendProcess.stderr.on("data", data => {
+  backendProcess.stderr.on("data", (data) => {
     console.error(`Backend ERROR: ${data.toString()}`);
   });
-
-  backendProcess.on("exit", code => {
+  backendProcess.on("exit", (code) => {
     console.log(`Backend finalizado com código ${code}`);
   });
+}
+
+/* ============================================================
+   PRODUÇÃO
+   O backend roda dentro do próprio processo do Electron
+   (Node embutido), sem depender de um `node` externo.
+   Os recursos vão empacotados em resources/ (extraResources).
+   ============================================================ */
+function startBackendProd() {
+  const serverPath = path.join(
+    process.resourcesPath,
+    "backend",
+    "src",
+    "server.js"
+  );
+  // eslint-disable-next-line import/no-dynamic-require, global-require
+  require(serverPath).start();
 }
 
 function createWindow() {
@@ -40,11 +62,15 @@ function createWindow() {
     autoHideMenuBar: true,
     titleBarStyle: "hidden",
     webPreferences: {
-      preload: path.join(__dirname, "preload.js")
-    }
+      preload: path.join(__dirname, "preload.js"),
+    },
   });
 
-  win.loadURL("http://localhost:5173");
+  if (isDev) {
+    win.loadURL("http://localhost:5173");
+  } else {
+    win.loadFile(path.join(process.resourcesPath, "frontend", "index.html"));
+  }
 
   ipcMain.on("window:minimize", () => win.minimize());
   ipcMain.on("window:maximize", () => {
@@ -54,10 +80,15 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  killPort(() => {
-    startBackend();
+  if (isDev) {
+    killPort(() => {
+      startBackendDev();
+      createWindow();
+    });
+  } else {
+    startBackendProd();
     createWindow();
-  });
+  }
 });
 
 app.on("window-all-closed", () => {

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 
 import Layout from "./components/Layout";
 
@@ -18,7 +18,7 @@ export default function App({ toggleTheme, mode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <Titlebar mode={mode} />
-      <BrowserRouter>
+      <HashRouter>
         <Layout toggleTheme={toggleTheme} mode={mode}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -29,7 +29,7 @@ export default function App({ toggleTheme, mode }) {
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </Layout>
-      </BrowserRouter>
+      </HashRouter>
     </QueryClientProvider>
   );
 }

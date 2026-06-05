@@ -7,7 +7,8 @@
   "scripts": {
     "start": "electron .",
     "dev": "nodemon --exec electron .",
-    "build": "electron-builder"
+    "build:frontend": "cd ../frontend && npm run build",
+    "build": "npm run build:frontend && electron-builder"
   },
   "dependencies": {
     "cross-env": "^10.1.0"
@@ -27,6 +28,24 @@
       "**/*",
       "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
       "!**/*.map"
+    ],
+    "extraResources": [
+      {
+        "from": "../backend/src",
+        "to": "backend/src"
+      },
+      {
+        "from": "../backend/node_modules",
+        "to": "backend/node_modules"
+      },
+      {
+        "from": "../backend/package.json",
+        "to": "backend/package.json"
+      },
+      {
+        "from": "../frontend/dist",
+        "to": "frontend"
+      }
     ],
     "win": {
       "target": "nsis",

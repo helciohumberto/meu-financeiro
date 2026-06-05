@@ -18,20 +18,22 @@ export default function Layout({ children, toggleTheme, mode }) {
           flexShrink: 0,
           display: "flex",
           flexDirection: "column",
-
-          // Estilo translúcido adaptado ao tema
           background: (theme) => theme.palette.background.paper,
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          borderRight: "1px solid rgba(255, 255, 255, 0.2)",
-          boxShadow: "2px 0 20px rgba(0, 0, 0, 0.1)"
+          borderRight: (theme) => `1px solid ${theme.palette.divider}`,
         }}
       >
         <Sidebar />
 
         {/* Botão de alternar tema */}
-        <Box sx={{ p: 2, mt: "auto", textAlign: "center" }}>
-          <Tooltip title="Alternar tema">
+        <Box
+          sx={{
+            p: 2,
+            mt: "auto",
+            textAlign: "center",
+            borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Tooltip title={mode === "light" ? "Modo escuro" : "Modo claro"}>
             <IconButton onClick={toggleTheme}>
               {mode === "light" ? <DarkMode /> : <LightMode />}
             </IconButton>

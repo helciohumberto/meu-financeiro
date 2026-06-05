@@ -9,6 +9,23 @@ import {
   Grid,
   CircularProgress,
 } from "@mui/material";
+import {
+  AccountBalanceWalletOutlined,
+  ReceiptLongOutlined,
+  FlagOutlined,
+  TrendingDownOutlined,
+  InsightsOutlined,
+  CategoryOutlined,
+  ArrowForwardOutlined,
+} from "@mui/icons-material";
+
+import StatCard from "../components/StatCard";
+
+const eur = (v) =>
+  new Intl.NumberFormat("pt-PT", {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number(v) || 0);
 
 export default function Home() {
   const navigate = useNavigate();
@@ -39,101 +56,135 @@ export default function Home() {
     );
   }
 
+  const navCards = [
+    {
+      title: "Dashboard",
+      desc: "Ver gráficos e resumo financeiro",
+      icon: <InsightsOutlined />,
+      color: "#0d9488",
+      path: "/dashboard",
+    },
+    {
+      title: "Lançamentos",
+      desc: "Gerir despesas e registos",
+      icon: <ReceiptLongOutlined />,
+      color: "#2563eb",
+      path: "/lancamentos",
+    },
+    {
+      title: "Categorias",
+      desc: "Organizar categorias de despesas",
+      icon: <CategoryOutlined />,
+      color: "#7c3aed",
+      path: "/categorias",
+    },
+  ];
+
   return (
     <Box sx={{ maxWidth: 1200, margin: "0 auto" }}>
       <Typography variant="h4" fontWeight="bold" gutterBottom>
         Meu Financeiro
       </Typography>
+      <Typography variant="body1" color="text.secondary" mb={3}>
+        Resumo do mês atual
+      </Typography>
 
       {/* RESUMO DO MÊS */}
-      <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} md={4}>
-          <Card sx={{ background: "#00897b", color: "white" }}>
-            <CardContent>
-              <Typography variant="h6">Saldo</Typography>
-              <Typography variant="h4" fontWeight="bold">
-                €{Number(data?.cash || 0).toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
+      <Grid container spacing={2.5} mb={4}>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Saldo"
+            value={eur(data?.cash)}
+            icon={<AccountBalanceWalletOutlined />}
+            color="#0d9488"
+            valueColor={Number(data?.cash) < 0 ? "error.main" : undefined}
+          />
         </Grid>
-        <Grid item xs={12} md={4}>
-          <Card sx={{ background: "#1976d2", color: "white" }}>
-            <CardContent>
-              <Typography variant="h6">Despesas</Typography>
-              <Typography variant="h4" fontWeight="bold">
-                €{Number(data?.totalMonth || 0).toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Despesas"
+            value={eur(data?.totalMonth)}
+            icon={<ReceiptLongOutlined />}
+            color="#e11d48"
+          />
         </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Card sx={{ background: "#2e7d32", color: "white" }}>
-            <CardContent>
-              <Typography variant="h6">Meta</Typography>
-              <Typography variant="h4" fontWeight="bold">
-                €{Number(data?.goal || 0).toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Meta"
+            value={eur(data?.goal)}
+            icon={<FlagOutlined />}
+            color="#2563eb"
+          />
         </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Card sx={{ background: "#d32f2f", color: "white" }}>
-            <CardContent>
-              <Typography variant="h6">Diferença da meta</Typography>
-              <Typography variant="h4" fontWeight="bold">
-                €{Number(data?.remaining || 0).toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Diferença da meta"
+            value={eur(data?.remaining)}
+            icon={<TrendingDownOutlined />}
+            color={Number(data?.remaining) < 0 ? "#e11d48" : "#16a34a"}
+            valueColor={
+              Number(data?.remaining) < 0 ? "error.main" : "success.main"
+            }
+          />
         </Grid>
       </Grid>
 
       {/* NAVEGAÇÃO */}
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={4}>
-          <Card
-            sx={{ cursor: "pointer" }}
-            onClick={() => navigate("/dashboard")}
-          >
-            <CardContent>
-              <Typography variant="h5" fontWeight="bold">
-                Dashboard
-              </Typography>
-              <Typography>Ver gráficos e resumo financeiro</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Card
-            sx={{ cursor: "pointer" }}
-            onClick={() => navigate("/lancamentos")}
-          >
-            <CardContent>
-              <Typography variant="h5" fontWeight="bold">
-                Lançamentos
-              </Typography>
-              <Typography>Gerir despesas e registos</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Card
-            sx={{ cursor: "pointer" }}
-            onClick={() => navigate("/categorias")}
-          >
-            <CardContent>
-              <Typography variant="h5" fontWeight="bold">
-                Categorias
-              </Typography>
-              <Typography>Organizar categorias de despesas</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+      <Grid container spacing={2.5}>
+        {navCards.map((c) => (
+          <Grid item xs={12} sm={6} md={4} key={c.path}>
+            <Card
+              onClick={() => navigate(c.path)}
+              sx={{
+                cursor: "pointer",
+                height: "100%",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  borderColor: c.color,
+                },
+              }}
+            >
+              <CardContent sx={{ py: 3 }}>
+                <Box
+                  sx={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 2.5,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: c.color,
+                    bgcolor: (t) =>
+                      t.palette.mode === "light"
+                        ? `${c.color}1f`
+                        : `${c.color}33`,
+                    mb: 2,
+                  }}
+                >
+                  {c.icon}
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Typography variant="h6" fontWeight={700}>
+                    {c.title}
+                  </Typography>
+                  <ArrowForwardOutlined
+                    fontSize="small"
+                    sx={{ color: "text.secondary" }}
+                  />
+                </Box>
+                <Typography variant="body2" color="text.secondary">
+                  {c.desc}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
     </Box>
   );

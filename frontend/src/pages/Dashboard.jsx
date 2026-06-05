@@ -7,15 +7,29 @@ import {
   MenuItem,
   TextField,
   Typography,
-  Card,
-  CardContent,
+  Paper,
   CircularProgress,
 } from "@mui/material";
+import {
+  AccountBalanceWalletOutlined,
+  ReceiptLongOutlined,
+  FlagOutlined,
+  PaymentsOutlined,
+  TrendingDownOutlined,
+  SendOutlined,
+} from "@mui/icons-material";
 
+import StatCard from "../components/StatCard";
 import CategoryPieChart from "../components/CategoryPieChart";
 import MonthlyLineChart from "../components/MonthlyLineChart";
 import RemessasBarChart from "../components/RemessasBarChart";
 import { getExchangeRate } from "../services/exchange";
+
+const eur = (v) =>
+  new Intl.NumberFormat("pt-PT", {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number(v) || 0);
 
 export default function Dashboard() {
   const [filters, setFilters] = useState({
@@ -49,7 +63,6 @@ export default function Dashboard() {
     queryKey: ["exchangeRate"],
     queryFn: getExchangeRate,
   });
-  console.log("exchange:", exchange);
 
   // 🔹 Conversão sem taxa
   const converterParaBRL = (valorEuro) => {
@@ -130,98 +143,109 @@ export default function Dashboard() {
       </Grid>
 
       {/* CARDS RESUMO */}
-      <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} md={4}>
-          <Card sx={{ background: "#00897b", color: "white" }}>
-            <CardContent>
-              <Typography variant="h6">Saldo</Typography>
-              <Typography variant="h4" fontWeight="bold">
-                €{Number(data.cash || 0).toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
+      <Grid container spacing={2.5} mb={4}>
+        <Grid item xs={12} sm={6} md={4}>
+          <StatCard
+            title="Saldo"
+            value={eur(data.cash)}
+            icon={<AccountBalanceWalletOutlined />}
+            color="#0d9488"
+            valueColor={Number(data.cash) < 0 ? "error.main" : undefined}
+          />
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Card sx={{ background: "#1976d2", color: "white" }}>
-            <CardContent>
-              <Typography variant="h6">Despesas</Typography>
-              <Typography variant="h4" fontWeight="bold">
-                €{data.totalMonth.toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={4}>
+          <StatCard
+            title="Despesas"
+            value={eur(data.totalMonth)}
+            icon={<ReceiptLongOutlined />}
+            color="#e11d48"
+          />
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Card sx={{ background: "#2e7d32", color: "white" }}>
-            <CardContent>
-              <Typography variant="h6">Meta</Typography>
-              <Typography variant="h4" fontWeight="bold">
-                €{data.goal.toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={4}>
+          <StatCard
+            title="Meta"
+            value={eur(data.goal)}
+            icon={<FlagOutlined />}
+            color="#2563eb"
+          />
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Card sx={{ background: "#6a1b9a", color: "white" }}>
-            <CardContent>
-              <Typography variant="h6">Salário</Typography>
-              <Typography variant="h4" fontWeight="bold">
-                €{Number(data.salary || 0).toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={4}>
+          <StatCard
+            title="Salário"
+            value={eur(data.salary)}
+            icon={<PaymentsOutlined />}
+            color="#7c3aed"
+          />
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Card sx={{ background: "#d32f2f", color: "white" }}>
-            <CardContent>
-              <Typography variant="h6">Diferença da meta</Typography>
-              <Typography variant="h4" fontWeight="bold">
-                €{data.remaining.toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={4}>
+          <StatCard
+            title="Diferença da meta"
+            value={eur(data.remaining)}
+            icon={<TrendingDownOutlined />}
+            color={Number(data.remaining) < 0 ? "#e11d48" : "#16a34a"}
+            valueColor={Number(data.remaining) < 0 ? "error.main" : "success.main"}
+          />
         </Grid>
 
-        {/* ⭐ TOTAL ENVIADO NO MÊS */}
-        {/* ⭐ TOTAL ENVIADO NO MÊS */}
-<Grid item xs={12} md={4}>
-  <Card sx={{ background: "#ff6f00", color: "white" }}>
-    <CardContent>
-      <Typography variant="h6">Enviado para o Brasil</Typography>
-
-      <Typography variant="h4" fontWeight="bold">
-        €{Number(data.totalEnviadoMes || 0).toFixed(2)}
-      </Typography>
-    </CardContent>
-  </Card>
-</Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <StatCard
+            title="Enviado para o Brasil"
+            value={eur(data.totalEnviadoMes)}
+            icon={<SendOutlined />}
+            color="#f59e0b"
+          />
+        </Grid>
       </Grid>
 
       {/* GRÁFICOS */}
-      <Grid container spacing={4}>
+      <Grid container spacing={2.5}>
         <Grid item xs={12} md={6}>
-          <Typography variant="h6" mb={2}>
-            Gastos por categoria
-          </Typography>
-          <CategoryPieChart data={data.byCategory || []} />
+          <Paper
+            sx={{
+              p: 3,
+              height: "100%",
+              border: (t) => `1px solid ${t.palette.divider}`,
+            }}
+          >
+            <Typography variant="h6" mb={2}>
+              Gastos por categoria
+            </Typography>
+            <CategoryPieChart data={data.byCategory || []} />
+          </Paper>
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Typography variant="h6" mb={2}>
-            Evolução mensal
-          </Typography>
-          <MonthlyLineChart data={data.monthly || []} />
+          <Paper
+            sx={{
+              p: 3,
+              height: "100%",
+              border: (t) => `1px solid ${t.palette.divider}`,
+            }}
+          >
+            <Typography variant="h6" mb={2}>
+              Evolução mensal
+            </Typography>
+            <MonthlyLineChart data={data.monthly || []} />
+          </Paper>
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Typography variant="h6" mb={2}>
-            Remessas para o Brasil (ano)
-          </Typography>
-          <RemessasBarChart data={graficoRemessas || []} />
+          <Paper
+            sx={{
+              p: 3,
+              height: "100%",
+              border: (t) => `1px solid ${t.palette.divider}`,
+            }}
+          >
+            <Typography variant="h6" mb={2}>
+              Remessas para o Brasil (ano)
+            </Typography>
+            <RemessasBarChart data={graficoRemessas || []} />
+          </Paper>
         </Grid>
       </Grid>
     </Box>

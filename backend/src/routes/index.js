@@ -6,9 +6,9 @@ const expenses = require("./expenses");
 const reports = require("./reports");
 
 router.use("/settings", require("./settings"));
-router.use("/reports", require("./reports"));
 router.use("/categories", categories);
 router.use("/expenses", expenses);
 router.use("/reports", reports);
+router.use("/exchange", require("./exchange"));
 
 module.exports = router;
