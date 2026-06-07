@@ -9,7 +9,9 @@ import {
   Typography,
   Paper,
   CircularProgress,
+  Skeleton,
 } from "@mui/material";
+import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import {
   AccountBalanceWalletOutlined,
   ReceiptLongOutlined,
@@ -23,6 +25,7 @@ import StatCard from "../components/StatCard";
 import CategoryPieChart from "../components/CategoryPieChart";
 import MonthlyLineChart from "../components/MonthlyLineChart";
 import RemessasBarChart from "../components/RemessasBarChart";
+import MonthlyAccumulatedChart from "../components/MonthlyAccumulatedChart";
 import { getExchangeRate } from "../services/exchange";
 import { eur } from "../utils/format";
 
@@ -46,11 +49,27 @@ export default function Dashboard() {
     queryFn: async () => (await api.get("/categories")).data,
   });
 
+  // 🔹 Acumulado diário
+  const { data: dailyData } = useQuery({
+    queryKey: ["daily", filters.month, filters.year],
+    queryFn: async () =>
+      (await api.get("/reports/daily", { params: { month: filters.month, year: filters.year } })).data,
+  });
+
   // 🔹 Gráfico de remessas
   const { data: graficoRemessas } = useQuery({
     queryKey: ["graficoRemessas", filters.year],
     queryFn: async () =>
       (await api.get(`/remessas/grafico/${filters.year}`)).data,
+  });
+
+  // 🔹 Insights IA
+  const { data: insightsData, isLoading: insightsLoading } = useQuery({
+    queryKey: ["ai-insights", filters.month, filters.year],
+    queryFn: async () =>
+      (await api.get("/ai/insights", { params: { month: filters.month, year: filters.year } })).data,
+    retry: false,
+    staleTime: 1000 * 60 * 30,
   });
 
   // 🔹 Câmbio EUR → BRL (API nova)
@@ -196,6 +215,40 @@ export default function Dashboard() {
         </Grid>
       </Grid>
 
+      {/* INSIGHTS IA */}
+      {(insightsLoading || insightsData?.insights) && (
+        <Paper
+          sx={{
+            p: 2.5,
+            mb: 4,
+            border: (t) => `1px solid ${t.palette.divider}`,
+            borderLeft: (t) => `3px solid ${t.palette.primary.main}`,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
+            <SmartToyOutlinedIcon fontSize="small" color="primary" />
+            <Typography variant="body2" fontWeight={600} color="primary">
+              Análise IA
+            </Typography>
+          </Box>
+          {insightsLoading ? (
+            <>
+              <Skeleton width="90%" height={20} />
+              <Skeleton width="75%" height={20} />
+              <Skeleton width="82%" height={20} />
+            </>
+          ) : (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ whiteSpace: "pre-line", lineHeight: 1.8 }}
+            >
+              {insightsData.insights}
+            </Typography>
+          )}
+        </Paper>
+      )}
+
       {/* GRÁFICOS */}
       <Grid container spacing={2.5}>
         <Grid item xs={12} md={6}>
@@ -240,6 +293,24 @@ export default function Dashboard() {
               Remessas para o Brasil (ano)
             </Typography>
             <RemessasBarChart data={graficoRemessas || []} />
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Paper
+            sx={{
+              p: 3,
+              height: "100%",
+              border: (t) => `1px solid ${t.palette.divider}`,
+            }}
+          >
+            <Typography variant="h6" mb={2}>
+              Acumulado do mês
+            </Typography>
+            <MonthlyAccumulatedChart
+              days={dailyData?.days || []}
+              goal={dailyData?.goal ?? data.goal}
+            />
           </Paper>
         </Grid>
       </Grid>

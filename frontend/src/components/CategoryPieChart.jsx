@@ -57,7 +57,7 @@ export default function CategoryPieChart({ data }) {
   const legendColor = theme.palette.text.secondary;
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={240}>
       <PieChart>
         <Pie
           data={data}

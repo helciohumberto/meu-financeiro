@@ -29,6 +29,7 @@ module.exports = {
       ]);
 
       const total = totalMonth[0]?.total || 0;
+      const expenseCount = await Expense.countDocuments(matchFilter);
 
       const byCategory = await Expense.aggregate([
         { $match: matchFilter },
@@ -113,12 +114,46 @@ module.exports = {
         byCategory,
         monthly,
         totalEnviadoMes,
-        totalEnviadoAno
+        totalEnviadoAno,
+        expenseCount
       });
 
     } catch (err) {
       console.error("Erro no dashboard:", err);
       res.status(500).json({ error: "Erro ao gerar dashboard" });
+    }
+  },
+
+  async daily(req, res) {
+    try {
+      const { month, year } = req.query;
+      const now = new Date();
+      const selectedMonth = month ? Number(month) - 1 : now.getMonth();
+      const selectedYear = year ? Number(year) : now.getFullYear();
+
+      const firstDay = new Date(selectedYear, selectedMonth, 1);
+      const lastDay = new Date(selectedYear, selectedMonth + 1, 0);
+      const daysInMonth = lastDay.getDate();
+
+      const dailyTotals = await Expense.aggregate([
+        { $match: { date: { $gte: firstDay, $lte: lastDay } } },
+        { $group: { _id: { $dayOfMonth: "$date" }, total: { $sum: "$value" } } },
+        { $sort: { _id: 1 } }
+      ]);
+
+      const settings = await Settings.findOne();
+      const goal = settings?.monthlyGoal ?? 1200;
+
+      const days = Array.from({ length: daysInMonth }, (_, i) => {
+        const day = i + 1;
+        const found = dailyTotals.find(d => d._id === day);
+        return { day, total: found ? found.total : 0 };
+      });
+
+      res.json({ days, goal });
+    } catch (err) {
+      console.error("Erro no acumulado diário:", err);
+      res.status(500).json({ error: "Erro ao gerar acumulado diário" });
     }
   }
 };

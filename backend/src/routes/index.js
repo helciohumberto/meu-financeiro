@@ -10,5 +10,6 @@ router.use("/categories", categories);
 router.use("/expenses", expenses);
 router.use("/reports", reports);
 router.use("/exchange", require("./exchange"));
+router.use("/ai", require("./ai"));
 
 module.exports = router;

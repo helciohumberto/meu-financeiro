@@ -16,10 +16,12 @@ import {
   CircularProgress,
   Box,
   InputAdornment,
+  Tooltip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import DownloadIcon from "@mui/icons-material/Download";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
+import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import ConfirmDialog from "../components/ConfirmDialog";
 import ImportCSVDialog from "../components/ImportCSVDialog";
 import Notification from "../components/Notification";
@@ -40,6 +42,7 @@ export default function Expenses() {
   const [page, setPage] = useState(1);
   const [confirmDelete, setConfirmDelete] = useState({ open: false, id: null });
   const [importOpen, setImportOpen] = useState(false);
+  const [suggesting, setSuggesting] = useState(false);
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -83,6 +86,28 @@ export default function Expenses() {
   const handleExport = () => {
     const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     exportToCSV(sorted, `despesas_${today}.csv`);
+  };
+
+  const handleSuggestCategory = async () => {
+    if (!form.description.trim()) {
+      notify("Escreve primeiro a descrição", "warning");
+      return;
+    }
+    setSuggesting(true);
+    try {
+      const { data } = await api.post("/ai/suggest-category", { description: form.description });
+      if (data.categoryId) {
+        setForm((f) => ({ ...f, category: data.categoryId }));
+        notify(`Categoria sugerida: ${data.categoryName}`);
+      } else {
+        notify("IA não encontrou uma categoria adequada", "warning");
+      }
+    } catch (err) {
+      const msg = err?.response?.data?.error ?? "Erro ao sugerir categoria";
+      notify(msg.includes("OPENAI_API_KEY") ? "Configura a OPENAI_API_KEY no .env" : msg, "error");
+    } finally {
+      setSuggesting(false);
+    }
   };
 
   const handleCreate = () => {
@@ -187,7 +212,7 @@ export default function Expenses() {
             onChange={(e) => setForm({ ...form, date: e.target.value })}
           />
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={2}>
           <TextField
             fullWidth
             select
@@ -202,6 +227,24 @@ export default function Expenses() {
               </MenuItem>
             ))}
           </TextField>
+        </Grid>
+        <Grid item xs={1} sx={{ display: "flex", alignItems: "center" }}>
+          <Tooltip title="Sugerir categoria com IA">
+            <span>
+              <Button
+                variant="outlined"
+                onClick={handleSuggestCategory}
+                disabled={suggesting || !form.description.trim()}
+                sx={{ minWidth: 0, px: 1.5, height: "100%" }}
+              >
+                {suggesting ? (
+                  <CircularProgress size={18} color="inherit" />
+                ) : (
+                  <SmartToyOutlinedIcon fontSize="small" />
+                )}
+              </Button>
+            </span>
+          </Tooltip>
         </Grid>
         <Grid item xs={2}>
           <Button

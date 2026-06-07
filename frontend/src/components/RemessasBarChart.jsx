@@ -54,7 +54,7 @@ export default function RemessasBarChart({ data }) {
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={240}>
       <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }} barSize={28}>
         <CartesianGrid stroke={gridColor} strokeDasharray="4 4" vertical={false} />
         <XAxis

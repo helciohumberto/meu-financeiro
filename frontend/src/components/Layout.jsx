@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import Sidebar from "./Sidebar";
+import AiChat from "./AiChat";
 import { LightMode, DarkMode } from "@mui/icons-material";
 
 export default function Layout({ children, toggleTheme, mode }) {
@@ -64,6 +65,8 @@ export default function Layout({ children, toggleTheme, mode }) {
       >
         {children}
       </Box>
+
+      <AiChat />
     </Box>
   );
 }
