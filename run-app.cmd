@@ -1,7 +1,6 @@
 @echo off
 title Meu Financeiro - Iniciando...
 
-:: SPLASH SCREEN
 cls
 echo ================================================
 echo          MEU FINANCEIRO - INICIANDO
@@ -11,19 +10,17 @@ echo Carregando serviços, aguarde...
 echo.
 timeout /t 2 >nul
 
-
-:: INICIAR BACKEND
-echo Iniciando backend...
-start "Backend" cmd /k "cd backend && npm start"
-
-:: INICIAR FRONTEND
+:: INICIAR FRONTEND (dev server do Vite)
 echo Iniciando frontend...
 start "Frontend" cmd /k "cd frontend && npm run dev"
 
-:: INICIAR ELECTRON
+:: Aguarda o Vite estar pronto antes do Electron carregar
+timeout /t 3 >nul
+
+:: INICIAR ELECTRON (já inicia o backend internamente)
 echo Iniciando Electron...
 start "Electron" cmd /k "cd app && npm start"
 
 echo.
-echo Todos os serviços foram iniciados.
+echo Serviços iniciados. O backend é gerido pelo Electron.
 pause

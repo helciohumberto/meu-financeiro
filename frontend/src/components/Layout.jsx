@@ -1,8 +1,11 @@
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { useState } from "react";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import Sidebar from "./Sidebar";
 import { LightMode, DarkMode } from "@mui/icons-material";
 
 export default function Layout({ children, toggleTheme, mode }) {
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
     <Box
       sx={{
@@ -21,7 +24,7 @@ export default function Layout({ children, toggleTheme, mode }) {
           borderRight: (theme) => `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Sidebar />
+        <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(c => !c)} />
 
         <Box
           sx={{
@@ -36,6 +39,17 @@ export default function Layout({ children, toggleTheme, mode }) {
               {mode === "light" ? <DarkMode /> : <LightMode />}
             </IconButton>
           </Tooltip>
+
+          {!collapsed && (
+            <Box sx={{ mt: 1.5 }}>
+              <Typography variant="caption" color="text.disabled" display="block" lineHeight={1.4}>
+                Desenvolvido por
+              </Typography>
+              <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" lineHeight={1.4}>
+                Hélcio Humberto
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Box>
 

@@ -34,3 +34,8 @@ desktop.ini
 # Editor (remova se quiser compartilhar configurações de workspace)
 .vscode/
 .idea/
+
+# Ferramentas de desenvolvimento local (não relevantes para o repositório)
+.claude/
+.agents/
+skills-lock.json

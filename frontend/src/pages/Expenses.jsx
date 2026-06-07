@@ -18,9 +18,13 @@ import {
   InputAdornment,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import DownloadIcon from "@mui/icons-material/Download";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 import ConfirmDialog from "../components/ConfirmDialog";
+import ImportCSVDialog from "../components/ImportCSVDialog";
 import Notification from "../components/Notification";
 import { useNotification } from "../hooks/useNotification";
+import { exportToCSV } from "../utils/csv";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -35,6 +39,7 @@ export default function Expenses() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [confirmDelete, setConfirmDelete] = useState({ open: false, id: null });
+  const [importOpen, setImportOpen] = useState(false);
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -74,6 +79,11 @@ export default function Expenses() {
     },
     onError: () => notify("Erro ao atualizar lançamento", "error"),
   });
+
+  const handleExport = () => {
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    exportToCSV(sorted, `despesas_${today}.csv`);
+  };
 
   const handleCreate = () => {
     if (!form.description.trim()) {
@@ -127,9 +137,28 @@ export default function Expenses() {
 
   return (
     <Box sx={{ p: 1 }}>
-      <Typography variant="h4" fontWeight="bold" gutterBottom>
-        Lançamentos
-      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+        <Typography variant="h4" fontWeight="bold">
+          Lançamentos
+        </Typography>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            variant="outlined"
+            startIcon={<UploadFileIcon />}
+            onClick={() => setImportOpen(true)}
+          >
+            Importar CSV
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            onClick={handleExport}
+            disabled={sorted.length === 0}
+          >
+            Exportar CSV
+          </Button>
+        </Box>
+      </Box>
 
 
       <Grid container spacing={2} mb={4}>
@@ -387,6 +416,16 @@ export default function Expenses() {
         message="Tem certeza que deseja apagar este lançamento?"
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete({ open: false, id: null })}
+      />
+
+      <ImportCSVDialog
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        categories={categories}
+        onImport={(count) => {
+          queryClient.invalidateQueries({ queryKey: ["expenses"] });
+          notify(`${count} lançamento(s) importado(s) com sucesso`);
+        }}
       />
 
       <Notification

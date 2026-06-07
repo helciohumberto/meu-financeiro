@@ -4,6 +4,7 @@ const controller = require("../controllers/expenseController");
 
 router.get("/", controller.list);
 router.post("/", controller.create);
+router.post("/bulk", controller.bulkCreate);
 router.put("/:id", controller.update);
 router.delete("/:id", controller.remove);
 

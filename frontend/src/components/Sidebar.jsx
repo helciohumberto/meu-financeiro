@@ -21,15 +21,10 @@ import {
 } from "@mui/icons-material";
 
 import { useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed, onToggle }) {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [collapsed, setCollapsed] = useState(false);
-
-  const toggleCollapse = () => setCollapsed(!collapsed);
 
   const isActive = (path) => location.pathname === path;
 
@@ -88,7 +83,7 @@ export default function Sidebar() {
           </Box>
         )}
 
-        <IconButton onClick={toggleCollapse}>
+        <IconButton onClick={onToggle}>
           {collapsed ? <MenuIcon /> : <ChevronLeft />}
         </IconButton>
       </Box>
