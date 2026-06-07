@@ -23,9 +23,6 @@ module.exports = {
         matchFilter.category = category;
       }
 
-      // ============================
-      // TOTAL DE DESPESAS DO MÊS
-      // ============================
       const totalMonth = await Expense.aggregate([
         { $match: matchFilter },
         { $group: { _id: null, total: { $sum: "$value" } } }
@@ -33,9 +30,6 @@ module.exports = {
 
       const total = totalMonth[0]?.total || 0;
 
-      // ============================
-      // DESPESAS POR CATEGORIA
-      // ============================
       const byCategory = await Expense.aggregate([
         { $match: matchFilter },
         { $group: { _id: "$category", value: { $sum: "$value" } } },
@@ -58,9 +52,6 @@ module.exports = {
         }
       ]);
 
-      // ============================
-      // GRÁFICO MENSAL DE DESPESAS
-      // ============================
       const monthly = await Expense.aggregate([
         {
           $group: {
@@ -92,24 +83,15 @@ module.exports = {
         }
       ]);
 
-      // ============================
-      // CONFIGURAÇÕES (META E SALÁRIO)
-      // ============================
       let settings = await Settings.findOne();
 
       if (!settings) {
-        settings = await Settings.create({
-          monthlyGoal: 1200,
-          salary: 0
-        });
+        settings = await Settings.create({ monthlyGoal: 1200, salary: 0 });
       }
 
       const goal = settings?.monthlyGoal ?? 1200;
       const salary = settings?.salary ?? 0;
 
-      // ============================
-      // TOTAL ENVIADO NO MÊS (REMESSAS)
-      // ============================
       const remessaMes = await Remessa.findOne({
         month: selectedMonth + 1,
         year: selectedYear
@@ -117,24 +99,11 @@ module.exports = {
 
       const totalEnviadoMes = remessaMes ? remessaMes.amount : 0;
 
-      // ============================
-      // TOTAL ENVIADO NO ANO
-      // ============================
       const remessasAno = await Remessa.find({ year: selectedYear });
+      const totalEnviadoAno = remessasAno.reduce((sum, r) => sum + (r.amount || 0), 0);
 
-      const totalEnviadoAno = remessasAno.reduce(
-        (sum, r) => sum + (r.amount || 0),
-        0
-      );
-
-      // ============================
-      // SALDO ATUAL
-      // ============================
       const cash = salary - total - totalEnviadoMes;
 
-      // ============================
-      // RETORNO FINAL
-      // ============================
       res.json({
         totalMonth: total,
         goal,

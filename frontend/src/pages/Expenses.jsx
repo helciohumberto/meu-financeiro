@@ -131,7 +131,7 @@ export default function Expenses() {
         Lançamentos
       </Typography>
 
-      {/* FORMULÁRIO */}
+
       <Grid container spacing={2} mb={4}>
         <Grid item xs={3}>
           <TextField
@@ -192,7 +192,7 @@ export default function Expenses() {
         </Grid>
       </Grid>
 
-      {/* FILTROS */}
+
       <Grid container spacing={2} mb={3} alignItems="center">
         <Grid item xs={12} sm={4}>
           <TextField
@@ -251,7 +251,7 @@ export default function Expenses() {
         )}
       </Grid>
 
-      {/* EMPTY STATE */}
+
       {sorted.length === 0 && (
         <Box sx={{ textAlign: "center", py: 6, color: "text.secondary" }}>
           <Typography variant="h6">
@@ -269,7 +269,7 @@ export default function Expenses() {
         </Box>
       )}
 
-      {/* LISTAGEM */}
+
       <Grid container spacing={2}>
         {paginated.map((exp) => (
           <Grid item key={exp._id}>
@@ -306,7 +306,7 @@ export default function Expenses() {
         ))}
       </Grid>
 
-      {/* PAGINAÇÃO */}
+
       {sorted.length > 0 && (
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 3 }}>
           <Button disabled={page === 1} onClick={() => setPage(page - 1)}>
@@ -321,7 +321,7 @@ export default function Expenses() {
         </Box>
       )}
 
-      {/* MODAL DE EDIÇÃO */}
+
       <Dialog open={!!editData} onClose={() => setEditData(null)}>
         <DialogTitle>Editar Lançamento</DialogTitle>
         <DialogContent>
@@ -380,7 +380,7 @@ export default function Expenses() {
         </DialogActions>
       </Dialog>
 
-      {/* CONFIRMAÇÃO DE APAGAR */}
+
       <ConfirmDialog
         open={confirmDelete.open}
         title="Apagar lançamento"

@@ -80,7 +80,7 @@ export default function Categories() {
         Categorias
       </Typography>
 
-      {/* FORMULÁRIO */}
+
       <Grid container spacing={2} mb={4}>
         <Grid item xs={4}>
           <TextField
@@ -124,7 +124,7 @@ export default function Categories() {
         </Grid>
       </Grid>
 
-      {/* EMPTY STATE */}
+
       {categories?.length === 0 && (
         <Box sx={{ textAlign: "center", py: 6, color: "text.secondary" }}>
           <Typography variant="h6">Nenhuma categoria criada</Typography>
@@ -134,7 +134,7 @@ export default function Categories() {
         </Box>
       )}
 
-      {/* LISTAGEM */}
+
       <Grid container spacing={2}>
         {categories?.map((cat) => (
           <Grid item key={cat._id}>
@@ -174,7 +174,7 @@ export default function Categories() {
         ))}
       </Grid>
 
-      {/* MODAL DE EDIÇÃO */}
+
       <Dialog open={!!editData} onClose={() => setEditData(null)}>
         <DialogTitle>Editar Categoria</DialogTitle>
         <DialogContent>
@@ -218,7 +218,7 @@ export default function Categories() {
         </DialogActions>
       </Dialog>
 
-      {/* CONFIRMAÇÃO DE APAGAR */}
+
       <ConfirmDialog
         open={confirmDelete.open}
         title="Apagar categoria"

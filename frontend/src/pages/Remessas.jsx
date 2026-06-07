@@ -106,7 +106,7 @@ export default function Remessas() {
         Remessas para o Brasil
       </Typography>
 
-      {/* FORMULÁRIO */}
+
       <Paper sx={{ padding: 3, marginBottom: 4 }}>
         <Typography variant="h6" mb={2}>
           {editId ? "Editar envio" : "Registrar envio"}
@@ -172,7 +172,7 @@ export default function Remessas() {
         </Box>
       </Paper>
 
-      {/* TOTAL ANUAL */}
+
       <Paper sx={{ padding: 3, marginBottom: 4 }}>
         <Typography variant="h6" mb={1}>Total enviado no ano</Typography>
         <Typography variant="h4" fontWeight="bold">{eur(total)}</Typography>
@@ -183,7 +183,7 @@ export default function Remessas() {
         )}
       </Paper>
 
-      {/* LISTA DE REMESSAS */}
+
       <Paper sx={{ padding: 3 }}>
         <Typography variant="h6" mb={2}>Histórico de envios</Typography>
 
@@ -229,7 +229,7 @@ export default function Remessas() {
         ))}
       </Paper>
 
-      {/* CONFIRMAÇÃO DE APAGAR */}
+
       <ConfirmDialog
         open={confirmDelete.open}
         title="Apagar remessa"

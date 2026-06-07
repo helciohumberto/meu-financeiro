@@ -23,11 +23,6 @@ app.use(helmet());
 app.use("/remessas", remessasRoutes);
 app.use("/", routes);
 
-/**
- * Inicia a conexão com o MongoDB e o servidor HTTP.
- * Exportado para poder ser executado in-process pelo Electron (produção),
- * além de ser chamado quando o arquivo é rodado diretamente (dev).
- */
 function start() {
   mongoose
     .connect(MONGO_URI)

@@ -12,7 +12,6 @@ export default function Layout({ children, toggleTheme, mode }) {
         background: (theme) => theme.palette.background.default
       }}
     >
-      {/* Sidebar */}
       <Box
         sx={{
           flexShrink: 0,
@@ -24,7 +23,6 @@ export default function Layout({ children, toggleTheme, mode }) {
       >
         <Sidebar />
 
-        {/* Botão de alternar tema */}
         <Box
           sx={{
             p: 2,
@@ -41,7 +39,6 @@ export default function Layout({ children, toggleTheme, mode }) {
         </Box>
       </Box>
 
-      {/* Conteúdo */}
       <Box
         sx={{
           flexGrow: 1,

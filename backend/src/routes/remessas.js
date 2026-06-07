@@ -3,37 +3,23 @@ const Remessa = require("../models/Remessa");
 
 const router = express.Router();
 
-/* ============================================================
-   REGISTRAR REMESSA (CRIAR OU ATUALIZAR)
-
-   O saldo (cash) é calculado dinamicamente pelo dashboard
-   (salary - despesas do mês - remessa do mês), portanto aqui
-   apenas persistimos a remessa — sem manter um saldo paralelo.
-   ============================================================ */
+// O saldo é calculado dinamicamente no dashboard (salary - despesas - remessa),
+// por isso aqui apenas persistimos a remessa sem manter saldo paralelo.
 router.post("/", async (req, res) => {
   try {
     const { month, year, amount, rate } = req.body;
 
-    // Verifica se já existe remessa no mês (uma remessa por mês/ano)
     const existente = await Remessa.findOne({ month, year });
 
     if (existente) {
       existente.amount = amount;
       if (rate != null) existente.rate = rate;
       await existente.save();
-
-      return res.json({
-        message: "Remessa atualizada",
-        remessa: existente
-      });
+      return res.json({ message: "Remessa atualizada", remessa: existente });
     }
 
     const remessa = await Remessa.create({ month, year, amount, rate });
-
-    res.json({
-      message: "Remessa registrada",
-      remessa
-    });
+    res.json({ message: "Remessa registrada", remessa });
 
   } catch (err) {
     console.error(err);
@@ -41,9 +27,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-/* ============================================================
-   EDITAR REMESSA
-   ============================================================ */
 router.put("/:id", async (req, res) => {
   try {
     const { amount, month, year, rate } = req.body;
@@ -59,10 +42,7 @@ router.put("/:id", async (req, res) => {
     if (rate != null) remessa.rate = rate;
     await remessa.save();
 
-    res.json({
-      message: "Remessa atualizada com sucesso",
-      remessa
-    });
+    res.json({ message: "Remessa atualizada com sucesso", remessa });
 
   } catch (err) {
     console.error(err);
@@ -70,9 +50,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-/* ============================================================
-   DELETAR REMESSA
-   ============================================================ */
 router.delete("/:id", async (req, res) => {
   try {
     const remessa = await Remessa.findById(req.params.id);
@@ -81,10 +58,7 @@ router.delete("/:id", async (req, res) => {
     }
 
     await remessa.deleteOne();
-
-    res.json({
-      message: "Remessa deletada"
-    });
+    res.json({ message: "Remessa deletada" });
 
   } catch (err) {
     console.error(err);
@@ -92,17 +66,11 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-/* ============================================================
-   TOTAL ANUAL
-   ============================================================ */
 router.get("/total/:year", async (req, res) => {
   try {
     const { year } = req.params;
-
     const remessas = await Remessa.find({ year: Number(year) });
-
     const total = remessas.reduce((sum, r) => sum + r.amount, 0);
-
     res.json({ total, remessas });
 
   } catch (err) {
@@ -111,13 +79,9 @@ router.get("/total/:year", async (req, res) => {
   }
 });
 
-/* ============================================================
-   DADOS PARA GRÁFICO
-   ============================================================ */
 router.get("/grafico/:year", async (req, res) => {
   try {
     const { year } = req.params;
-
     const remessas = await Remessa.find({ year: Number(year) });
 
     const meses = Array.from({ length: 12 }, (_, i) => ({

@@ -39,7 +39,6 @@ export default function Sidebar() {
     { label: "Lançamentos", icon: <AccountBalanceWallet />, path: "/lancamentos" },
     { label: "Categorias", icon: <Category />, path: "/categorias" },
 
-    // ⭐ NOVO ITEM ADICIONADO AQUI
     { label: "Remessas", icon: <Send />, path: "/remessas" },
 
     { label: "Configurações", icon: <Settings />, path: "/settings" }
@@ -58,7 +57,6 @@ export default function Sidebar() {
         color: (theme) => theme.palette.text.primary
       }}
     >
-      {/* Header com botão de colapsar */}
       <Box
         sx={{
           display: "flex",
@@ -95,7 +93,6 @@ export default function Sidebar() {
         </IconButton>
       </Box>
 
-      {/* Lista de itens */}
       <List sx={{ mt: 1 }}>
         {menuItems.map((item) => {
           const active = isActive(item.path);
