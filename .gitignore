@@ -1,6 +1,36 @@
-node_modules
-.env
+# Dependências
+**/node_modules/
+
+# Variáveis de ambiente (use .env.example como template)
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Build outputs
+**/dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Electron builder - instaladores e pacotes gerados
+app/dist/
+*.exe
+*.msi
+*.dmg
+*.AppImage
+*.deb
+*.rpm
+
+# Arquivos temporários e pessoais
 cola.txt
-.vscode
-dist
-run-app.cmd
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor (remova se quiser compartilhar configurações de workspace)
+.vscode/
+.idea/
