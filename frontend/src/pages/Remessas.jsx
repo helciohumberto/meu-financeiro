@@ -8,80 +8,86 @@ import {
   MenuItem,
   Button,
   Paper,
-  Divider
+  Divider,
+  CircularProgress,
 } from "@mui/material";
+import { eur, brl } from "../utils/format";
+import ConfirmDialog from "../components/ConfirmDialog";
+import Notification from "../components/Notification";
+import { useNotification } from "../hooks/useNotification";
 
-const eur = (v) =>
-  new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(
-    Number(v) || 0
-  );
-
-const brl = (v) =>
-  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
-    Number(v) || 0
-  );
+const MONTHS = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
 
 export default function Remessas() {
+  const { notif, notify, close } = useNotification();
+
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
   const [amount, setAmount] = useState("");
-
   const [lista, setLista] = useState([]);
   const [total, setTotal] = useState(0);
-
   const [editId, setEditId] = useState(null);
-
-  // Cotação EUR -> BRL ao vivo (registrada junto à remessa ao salvar)
   const [rate, setRate] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState({ open: false, id: null });
 
-  const months = [
-    "Jan","Fev","Mar","Abr","Mai","Jun",
-    "Jul","Ago","Set","Out","Nov","Dez"
-  ];
+  const carregarTudo = async () => {
+    const res = await api.get(`/remessas/total/${year}`);
+    setLista(res.data.remessas);
+    setTotal(res.data.total);
+  };
 
-  /* ============================
-     SALVAR NOVA REMESSA
-     ============================ */
+  useEffect(() => { carregarTudo(); }, [year]);
+
+  useEffect(() => {
+    getExchangeRate()
+      .then((data) => setRate(data?.rates?.BRL ?? null))
+      .catch(() => setRate(null));
+  }, []);
+
+  const limparFormulario = () => {
+    setAmount("");
+    setEditId(null);
+  };
+
   const salvar = async () => {
-    await api.post("/remessas", {
-      month,
-      year,
-      amount: Number(amount),
-      rate
-    });
-
-    limparFormulario();
-    carregarTudo();
+    setSaving(true);
+    try {
+      await api.post("/remessas", { month, year, amount: Number(amount), rate });
+      limparFormulario();
+      await carregarTudo();
+      notify("Remessa registada com sucesso");
+    } catch {
+      notify("Erro ao registar remessa", "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  /* ============================
-     ATUALIZAR REMESSA
-     ============================ */
   const atualizar = async () => {
-    await api.put(`/remessas/${editId}`, {
-      month,
-      year,
-      amount: Number(amount),
-      rate
-    });
-
-    limparFormulario();
-    carregarTudo();
+    setSaving(true);
+    try {
+      await api.put(`/remessas/${editId}`, { month, year, amount: Number(amount), rate });
+      limparFormulario();
+      await carregarTudo();
+      notify("Remessa atualizada");
+    } catch {
+      notify("Erro ao atualizar remessa", "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  /* ============================
-     DELETAR REMESSA
-     ============================ */
   const deletar = async (id) => {
-    if (!confirm("Deseja realmente deletar esta remessa?")) return;
-
-    await api.delete(`/remessas/${id}`);
-    carregarTudo();
+    try {
+      await api.delete(`/remessas/${id}`);
+      await carregarTudo();
+      notify("Remessa apagada");
+    } catch {
+      notify("Erro ao apagar remessa", "error");
+    }
   };
 
-  /* ============================
-     EDITAR (CARREGA NO FORM)
-     ============================ */
   const editar = (r) => {
     setMonth(r.month);
     setYear(r.year);
@@ -89,35 +95,6 @@ export default function Remessas() {
     setEditId(r._id);
   };
 
-  /* ============================
-     LIMPAR FORMULÁRIO
-     ============================ */
-  const limparFormulario = () => {
-    setAmount("");
-    setEditId(null);
-  };
-
-  /* ============================
-     CARREGAR LISTA E TOTAL
-     ============================ */
-  const carregarTudo = async () => {
-    const res = await api.get(`/remessas/total/${year}`);
-    setLista(res.data.remessas);
-    setTotal(res.data.total);
-  };
-
-  useEffect(() => {
-    carregarTudo();
-  }, [year]);
-
-  // Busca a cotação atual ao abrir a página
-  useEffect(() => {
-    getExchangeRate()
-      .then((data) => setRate(data?.rates?.BRL ?? null))
-      .catch(() => setRate(null));
-  }, []);
-
-  // Total enviado no ano em R$ (soma de cada remessa pela cotação gravada)
   const totalBRL = lista.reduce(
     (sum, r) => sum + (r.rate ? r.amount * r.rate : 0),
     0
@@ -143,7 +120,7 @@ export default function Remessas() {
           onChange={(e) => setMonth(Number(e.target.value))}
           sx={{ mb: 2 }}
         >
-          {months.map((m, i) => (
+          {MONTHS.map((m, i) => (
             <MenuItem key={i} value={i + 1}>{m}</MenuItem>
           ))}
         </TextField>
@@ -158,17 +135,17 @@ export default function Remessas() {
         />
 
         <TextField
-  fullWidth
-  label="Valor enviado (€)"
-  type="number"
-  value={amount}
-  error={Number(amount) <= 0}
-  helperText={
-    Number(amount) <= 0 ? "O valor deve ser maior que zero." : ""
-  }
-  onChange={(e) => setAmount(e.target.value)}
-  sx={{ mb: 1 }}
-/>
+          fullWidth
+          label="Valor enviado (€)"
+          type="number"
+          value={amount}
+          error={amount !== "" && Number(amount) <= 0}
+          helperText={
+            amount !== "" && Number(amount) <= 0 ? "O valor deve ser maior que zero." : ""
+          }
+          onChange={(e) => setAmount(e.target.value)}
+          sx={{ mb: 1 }}
+        />
 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           {rate
@@ -182,10 +159,11 @@ export default function Remessas() {
           <Button
             variant="contained"
             onClick={editId ? atualizar : salvar}
+            disabled={saving || !amount || Number(amount) <= 0}
+            startIcon={saving ? <CircularProgress size={16} color="inherit" /> : null}
           >
             {editId ? "Atualizar" : "Salvar"}
           </Button>
-
           {editId && (
             <Button variant="outlined" color="warning" onClick={limparFormulario}>
               Cancelar edição
@@ -197,9 +175,7 @@ export default function Remessas() {
       {/* TOTAL ANUAL */}
       <Paper sx={{ padding: 3, marginBottom: 4 }}>
         <Typography variant="h6" mb={1}>Total enviado no ano</Typography>
-        <Typography variant="h4" fontWeight="bold">
-          {eur(total)}
-        </Typography>
+        <Typography variant="h4" fontWeight="bold">{eur(total)}</Typography>
         {totalBRL > 0 && (
           <Typography variant="body2" color="text.secondary">
             ≈ {brl(totalBRL)} recebidos no Brasil
@@ -212,7 +188,9 @@ export default function Remessas() {
         <Typography variant="h6" mb={2}>Histórico de envios</Typography>
 
         {lista.length === 0 && (
-          <Typography>Nenhuma remessa registrada neste ano.</Typography>
+          <Typography color="text.secondary">
+            Nenhuma remessa registada neste ano.
+          </Typography>
         )}
 
         {lista.map((r, index) => (
@@ -221,12 +199,12 @@ export default function Remessas() {
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
-                padding: "12px 0"
+                padding: "12px 0",
               }}
             >
               <Box>
                 <Typography>
-                  {months[r.month - 1]} / {r.year} —{" "}
+                  {MONTHS[r.month - 1]} / {r.year} —{" "}
                   <strong>{eur(r.amount)}</strong>
                 </Typography>
                 {r.rate && (
@@ -235,26 +213,40 @@ export default function Remessas() {
                   </Typography>
                 )}
               </Box>
-
               <Box sx={{ display: "flex", gap: 2 }}>
-                <Button variant="outlined" onClick={() => editar(r)}>
-                  Editar
-                </Button>
-
+                <Button variant="outlined" onClick={() => editar(r)}>Editar</Button>
                 <Button
                   variant="outlined"
                   color="error"
-                  onClick={() => deletar(r._id)}
+                  onClick={() => setConfirmDelete({ open: true, id: r._id })}
                 >
                   Deletar
                 </Button>
               </Box>
             </Box>
-
             {index < lista.length - 1 && <Divider />}
           </Box>
         ))}
       </Paper>
+
+      {/* CONFIRMAÇÃO DE APAGAR */}
+      <ConfirmDialog
+        open={confirmDelete.open}
+        title="Apagar remessa"
+        message="Tem certeza que deseja apagar esta remessa?"
+        onConfirm={() => {
+          deletar(confirmDelete.id);
+          setConfirmDelete({ open: false, id: null });
+        }}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+      />
+
+      <Notification
+        open={notif.open}
+        message={notif.message}
+        severity={notif.severity}
+        onClose={close}
+      />
     </Box>
   );
 }

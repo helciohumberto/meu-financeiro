@@ -1,6 +1,7 @@
 {
   "name": "meu-financeiro-frontend",
   "version": "1.0.0",
+  "author": "Hélcio Humberto",
   "scripts": {
     "dev": "vite",
     "build": "vite build"

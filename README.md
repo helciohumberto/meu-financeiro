@@ -113,3 +113,7 @@ Nenhum script de teste configurado atualmente. Para validar execução, inicie b
 ## 📝 Observações
 
 Este README foi gerado com base na estrutura do projeto existente. Ajuste os detalhes de porta, variáveis e comportamentos de API conforme suas implementações.
+
+---
+
+Desenvolvido por **Hélcio Humberto**

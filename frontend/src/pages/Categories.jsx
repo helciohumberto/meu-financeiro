@@ -11,49 +11,71 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  CircularProgress,
+  Box,
 } from "@mui/material";
+import ConfirmDialog from "../components/ConfirmDialog";
+import Notification from "../components/Notification";
+import { useNotification } from "../hooks/useNotification";
 
 export default function Categories() {
   const queryClient = useQueryClient();
+  const { notif, notify, close } = useNotification();
 
-  const [form, setForm] = useState({
-    name: "",
-    color: "#1976d2",
-    icon: "Category"
-  });
-
+  const [form, setForm] = useState({ name: "", color: "#1976d2", icon: "Category" });
   const [editData, setEditData] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState({ open: false, id: null });
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
-    queryFn: async () => (await api.get("/categories")).data
+    queryFn: async () => (await api.get("/categories")).data,
   });
 
   const createMutation = useMutation({
-    mutationFn: async () => api.post("/categories", form),
+    mutationFn: () => api.post("/categories", form),
     onSuccess: () => {
-      queryClient.invalidateQueries(["categories"]);
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       setForm({ name: "", color: "#1976d2", icon: "Category" });
-    }
+      notify("Categoria criada com sucesso");
+    },
+    onError: () => notify("Erro ao criar categoria", "error"),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id) => api.delete(`/categories/${id}`),
-    onSuccess: () => queryClient.invalidateQueries(["categories"])
+    mutationFn: (id) => api.delete(`/categories/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      notify("Categoria apagada");
+    },
+    onError: () => notify("Erro ao apagar categoria", "error"),
   });
 
   const updateMutation = useMutation({
-    mutationFn: async () =>
-      api.put(`/categories/${editData._id}`, editData),
+    mutationFn: () => api.put(`/categories/${editData._id}`, editData),
     onSuccess: () => {
-      queryClient.invalidateQueries(["categories"]);
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       setEditData(null);
-    }
+      notify("Categoria atualizada");
+    },
+    onError: () => notify("Erro ao atualizar categoria", "error"),
   });
 
+  const handleCreate = () => {
+    if (!form.name.trim()) {
+      notify("O nome da categoria é obrigatório", "warning");
+      return;
+    }
+    createMutation.mutate();
+  };
+
+  const handleDeleteConfirm = () => {
+    deleteMutation.mutate(confirmDelete.id);
+    setConfirmDelete({ open: false, id: null });
+  };
+
   return (
-    <div style={{ padding: 5 }}>
+    <Box sx={{ p: 1 }}>
       <Typography variant="h4" fontWeight="bold" gutterBottom>
         Categorias
       </Typography>
@@ -68,7 +90,6 @@ export default function Categories() {
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
         </Grid>
-
         <Grid item xs={3}>
           <TextField
             fullWidth
@@ -78,7 +99,6 @@ export default function Categories() {
             onChange={(e) => setForm({ ...form, color: e.target.value })}
           />
         </Grid>
-
         <Grid item xs={3}>
           <TextField
             fullWidth
@@ -87,17 +107,32 @@ export default function Categories() {
             onChange={(e) => setForm({ ...form, icon: e.target.value })}
           />
         </Grid>
-
         <Grid item xs={2}>
           <Button
             fullWidth
             variant="contained"
-            onClick={() => createMutation.mutate()}
-            >
+            onClick={handleCreate}
+            disabled={createMutation.isPending}
+            startIcon={
+              createMutation.isPending ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : null
+            }
+          >
             Criar
           </Button>
         </Grid>
       </Grid>
+
+      {/* EMPTY STATE */}
+      {categories?.length === 0 && (
+        <Box sx={{ textAlign: "center", py: 6, color: "text.secondary" }}>
+          <Typography variant="h6">Nenhuma categoria criada</Typography>
+          <Typography variant="body2">
+            Crie a primeira categoria acima para começar a organizar as despesas.
+          </Typography>
+        </Box>
+      )}
 
       {/* LISTAGEM */}
       <Grid container spacing={2}>
@@ -106,34 +141,31 @@ export default function Categories() {
             <Card sx={{ width: 220 }}>
               <CardContent>
                 <Typography variant="h6">{cat.name}</Typography>
-
-                <div
-                  style={{
+                <Box
+                  sx={{
                     width: 30,
                     height: 30,
                     background: cat.color,
                     borderRadius: "50%",
-                    marginTop: 10
+                    mt: 1.5,
                   }}
                 />
-
                 <Typography variant="body2" sx={{ mt: 1 }}>
                   Ícone: {cat.icon}
                 </Typography>
-
                 <Button
                   variant="outlined"
                   sx={{ mt: 2, mr: 1 }}
                   onClick={() => setEditData(cat)}
-                  >
+                >
                   Editar
                 </Button>
-
                 <Button
                   color="error"
                   sx={{ mt: 2 }}
-                  onClick={() => deleteMutation.mutate(cat._id)}
-                  >
+                  onClick={() => setConfirmDelete({ open: true, id: cat._id })}
+                  disabled={deleteMutation.isPending}
+                >
                   Apagar
                 </Button>
               </CardContent>
@@ -151,41 +183,56 @@ export default function Categories() {
             label="Nome"
             sx={{ mt: 2 }}
             value={editData?.name || ""}
-            onChange={(e) =>
-              setEditData({ ...editData, name: e.target.value })
-            }
-            />
-
+            onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+          />
           <TextField
             fullWidth
             type="color"
             label="Cor"
             sx={{ mt: 2 }}
             value={editData?.color || "#1976d2"}
-            onChange={(e) =>
-              setEditData({ ...editData, color: e.target.value })
-            }
+            onChange={(e) => setEditData({ ...editData, color: e.target.value })}
           />
-
           <TextField
             fullWidth
             label="Ícone"
             sx={{ mt: 2 }}
             value={editData?.icon || ""}
-            onChange={(e) =>
-              setEditData({ ...editData, icon: e.target.value })
-            }
+            onChange={(e) => setEditData({ ...editData, icon: e.target.value })}
           />
         </DialogContent>
-
         <DialogActions>
           <Button onClick={() => setEditData(null)}>Cancelar</Button>
-          <Button variant="contained" onClick={() => updateMutation.mutate()}>
+          <Button
+            variant="contained"
+            onClick={() => updateMutation.mutate()}
+            disabled={updateMutation.isPending}
+            startIcon={
+              updateMutation.isPending ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : null
+            }
+          >
             Guardar
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
-              
+
+      {/* CONFIRMAÇÃO DE APAGAR */}
+      <ConfirmDialog
+        open={confirmDelete.open}
+        title="Apagar categoria"
+        message="Tem certeza que deseja apagar esta categoria? Esta ação não pode ser desfeita."
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+      />
+
+      <Notification
+        open={notif.open}
+        message={notif.message}
+        severity={notif.severity}
+        onClose={close}
+      />
+    </Box>
   );
 }

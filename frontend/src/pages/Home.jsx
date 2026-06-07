@@ -20,12 +20,7 @@ import {
 } from "@mui/icons-material";
 
 import StatCard from "../components/StatCard";
-
-const eur = (v) =>
-  new Intl.NumberFormat("pt-PT", {
-    style: "currency",
-    currency: "EUR",
-  }).format(Number(v) || 0);
+import { eur } from "../utils/format";
 
 export default function Home() {
   const navigate = useNavigate();

@@ -24,12 +24,7 @@ import CategoryPieChart from "../components/CategoryPieChart";
 import MonthlyLineChart from "../components/MonthlyLineChart";
 import RemessasBarChart from "../components/RemessasBarChart";
 import { getExchangeRate } from "../services/exchange";
-
-const eur = (v) =>
-  new Intl.NumberFormat("pt-PT", {
-    style: "currency",
-    currency: "EUR",
-  }).format(Number(v) || 0);
+import { eur } from "../utils/format";
 
 export default function Dashboard() {
   const [filters, setFilters] = useState({

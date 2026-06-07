@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Aplicativo desktop do Meu Financeiro",
   "main": "main.js",
-  "author": "Hélcio",
+  "author": "Hélcio Humberto",
   "scripts": {
     "start": "electron .",
     "dev": "nodemon --exec electron .",

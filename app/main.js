@@ -37,12 +37,6 @@ function startBackendDev() {
   });
 }
 
-/* ============================================================
-   PRODUÇÃO
-   O backend roda dentro do próprio processo do Electron
-   (Node embutido), sem depender de um `node` externo.
-   Os recursos vão empacotados em resources/ (extraResources).
-   ============================================================ */
 function startBackendProd() {
   const serverPath = path.join(
     process.resourcesPath,

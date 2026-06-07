@@ -12,8 +12,9 @@ import Settings from "./pages/Settings";
 import Titlebar from "./components/Titlebar/Titlebar";
 import "./components/Titlebar/Titlebar.css";
 
+const queryClient = new QueryClient();
+
 export default function App({ toggleTheme, mode }) {
-  const queryClient = new QueryClient();
 
   return (
     <QueryClientProvider client={queryClient}>

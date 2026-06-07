@@ -1,6 +1,7 @@
 {
   "name": "meu-financeiro-backend",
   "version": "1.0.0",
+  "author": "Hélcio Humberto",
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
